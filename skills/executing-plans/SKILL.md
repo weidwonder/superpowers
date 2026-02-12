@@ -1,15 +1,15 @@
 ---
 name: executing-plans
-description: Use when you have a written implementation plan to execute in a separate session with review checkpoints
+description: Use when you have a written implementation plan to execute in batches, continuing autonomously and pausing only for blockers or decision checkpoints
 ---
 
 # Executing Plans
 
 ## Overview
 
-Load plan, review critically, execute tasks in batches, report for review between batches.
+Load plan, review critically, execute tasks in batches, and continue by default unless review is required.
 
-**Core principle:** Batch execution with checkpoints for architect review.
+**Core principle:** Batch execution with exception-based checkpoints.
 
 **Announce at start:** "I'm using the executing-plans skill to implement this plan."
 
@@ -25,22 +25,30 @@ Load plan, review critically, execute tasks in batches, report for review betwee
 **Default: First 3 tasks**
 
 For each task:
+- If task is bugfix/test failure/unexpected behavior: use `superpowers:systematic-debugging` first, create isolated debug worktree before implementing fixes, and merge verified fix back to `main`/default branch
 1. Mark as in_progress
 2. Follow each step exactly (plan has bite-sized steps)
 3. Run verifications as specified
 4. Mark as completed
 
-### Step 3: Report
+### Step 3: Report and Decision
 When batch complete:
 - Show what was implemented
 - Show verification output
-- Say: "Ready for feedback."
+- If no blockers and no decisions needed: continue to next batch without waiting
+- If special cases appear: report and pause for partner input
+  - Unresolvable errors/blockers that you cannot handle alone
+  - Missing information/requirements needed to proceed
+  - Actual implementation conditions diverge from design/plan and require a decision
 
 ### Step 4: Continue
-Based on feedback:
-- Apply changes if needed
-- Execute next batch
+By default:
+- Execute next batch immediately
 - Repeat until complete
+
+If partner feedback is provided:
+- Apply changes if needed
+- Resume batch execution
 
 ### Step 5: Complete Development
 
@@ -56,6 +64,7 @@ After all tasks complete and verified:
 - Plan has critical gaps preventing starting
 - You don't understand an instruction
 - Verification fails repeatedly
+- Actual situation diverges from plan/design and requires partner decision
 
 **Ask for clarification rather than guessing.**
 
@@ -71,8 +80,9 @@ After all tasks complete and verified:
 - Review plan critically first
 - Follow plan steps exactly
 - Don't skip verifications
+- For debugging tasks, follow `superpowers:systematic-debugging` worktree + merge-to-main requirements
 - Reference skills when plan says to
-- Between batches: just report and wait
+- Between batches: report and continue by default; wait only for blockers/decisions
 - Stop when blocked, don't guess
 - Never start implementation on main/master branch without explicit user consent
 
